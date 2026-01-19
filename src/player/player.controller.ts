@@ -10,7 +10,9 @@ import {
 } from '@nestjs/common';
 import { PlayerService } from './player.service';
 import { Prisma } from '@prisma/client';
+import { Throttle, SkipThrottle } from '@nestjs/throttler';
 
+@SkipThrottle()
 @Controller('player')
 export class PlayerController {
   constructor(private readonly playerService: PlayerService) {}
@@ -20,6 +22,7 @@ export class PlayerController {
     return this.playerService.create(createPlayerDto);
   }
 
+  @Throttle({ short: { ttl: 1000, limit: 1 } })
   @Get()
   findAll(
     @Query('position')
